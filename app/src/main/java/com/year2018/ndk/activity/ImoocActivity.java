@@ -4,11 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
-import com.year2018.ndk.Constant;
 import com.year2018.ndk.R;
+import com.year2018.ndk.jniNative.Dynamic;
 import com.year2018.ndk.jniNative.Imooc;
 
 /**
@@ -16,11 +15,11 @@ import com.year2018.ndk.jniNative.Imooc;
  * Date: 2018/9/4 9:13
  */
 public class ImoocActivity extends Activity {
-    private TextView mTvMsg;
     private Imooc mImooc;
+    private StringBuffer mStringBuffer = new StringBuffer();
 
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("imooc-lib");
     }
 
     public static final void entry(Context from){
@@ -37,16 +36,15 @@ public class ImoocActivity extends Activity {
     }
 
     private void initUI(){
-        mTvMsg = (TextView)findViewById(R.id.tv_imooc_msg);
-        mTvMsg.setText(mImooc.stringFromJNI());
-        Imooc.callStaticMethod(21);
-    }
+//        mStringBuffer.append(mImooc.stringFromJNI()+"\n");
+//        Imooc.callStaticMethod(21);
+//
+//        mStringBuffer.append(General.getPkgName(ImoocActivity.this)+"\n");
+//        mStringBuffer.append(Dynamic.dynamicFromJNI()+"\n");
+//        mStringBuffer.append(Dynamic.logFromJni()+"\n");
 
-    private static void logMessage(String data){
-        Log.d(Constant.TAG,data);
-    }
+        Dynamic.typeTransform();
 
-    public static void staticMethod(String data){
-        logMessage(data);
+        ((TextView)findViewById(R.id.tv_imooc_msg)).setText(mStringBuffer);
     }
 }

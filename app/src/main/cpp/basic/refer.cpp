@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include "refer.h"
+#include "../full_log.h"
 
 /**
  * 将java字符串转换成C字符串
@@ -31,15 +32,17 @@ void array_operate(JNIEnv *env,jclass cls){
     jIntArr = env->NewIntArray(10);
     jint* arr;
     if(jIntArr!=0){
-        LOGD("create jintArray success");
-        // 将java数组手复制到给定的C数组中
+        MY_LOG_DEBUG("create jintArray success");
+        // 将java数组复制到给定的C数组中
         env->GetIntArrayRegion(jIntArr,0,10,arr);
         //对arr进行操作
-        // ...
+        for(int i= 0;i<10;i++){
+            arr[i]=i+1;
+        }
         // 将C数组复制回Java数组
         env->SetIntArrayRegion(jIntArr,0,10,arr);
     }
-    env->ReleaseIntArrayElements(jIntArr,arr,0);
+//    env->ReleaseIntArrayElements(jIntArr,arr,JNI_ABORT);
 }
 
 /**
@@ -55,10 +58,29 @@ void nio_operator(JNIEnv* env,jclass cls){
     directBuffer=NULL;
 }
 
+void exception_operator(JNIEnv* env,jclass cls){
+    jthrowable ex;
+    jmethodID throwingMethodID = env->GetStaticMethodID(cls,"throwingMethod","()V");
+    env->CallStaticVoidMethod(cls,throwingMethodID);
+    ex = env->ExceptionOccurred();
+    if(ex!=0){
+        env->ExceptionClear();
+    }
+    env->DeleteLocalRef(ex);
+
+    //抛出异常
+    jclass nullPointException = env->FindClass("java/lang/NullPointerException");
+    if(nullPointException!=0){
+        env->ThrowNew(nullPointException,"exception msg");
+    }
+    env->DeleteLocalRef(nullPointException);
+}
+
 void type_transform(JNIEnv *env,jclass cls){
     jstring_to_c(env,cls);
     array_operate(env,cls);
     nio_operator(env,cls);
+//    exception_operator(env,cls);
 }
 
 

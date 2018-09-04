@@ -3,8 +3,9 @@
  */
 
 #include <jni.h>
-#include "simple_log.h"
+#include <android/log.h>
 #include "demo_log.h"
+#include "basic/refer.h"
 
 /**
  * C++层 native函数
@@ -36,6 +37,11 @@ static JNINativeMethod jniMethods[] = {
                 "logFromJni",
                 "()Ljava/lang/String;",
                 (void *)native_log
+        },
+        {
+                "typeTransform",
+                "()V",
+                (void *)type_transform
         }
 };
 

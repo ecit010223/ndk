@@ -17,7 +17,11 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             src/main/cpp/CImooc.cpp )
+             src/main/cpp/imooc.cpp 
+			 src/main/cpp/general.cpp 
+			 src/main/cpp/dynamic.cpp 
+			 src/main/cpp/demo_log.cpp
+			 src/main/cpp/basic/refer.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

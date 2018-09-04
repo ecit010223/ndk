@@ -56,14 +56,15 @@ JNIEXPORT void JNICALL Java_com_year2018_ndk_jniNative_Imooc_callStaticMethod__I
  */
 JNIEXPORT void JNICALL Java_com_year2018_ndk_jniNative_Imooc_callStaticMethod__JLjava_lang_String_2
         (JNIEnv *env, jclass jClsImooc, jlong ji, jstring jstr){
-//    if(jClsImooc==NULL){
-//        return;
-//    }
-//    jmethodID mtdStaticMethod = env->GetStaticMethodID(jClsImooc,"staticMethod","(Ljava/lang/String;)V");
-//    if(mtdStaticMethod==NULL){
-//        return;
-//    }
-//    LOGD(env->GetStringUTFChars((jstring)ji, false));
+    if(jClsImooc==NULL){
+        return;
+    }
+    jmethodID mtdStaticMethod = env->GetStaticMethodID(jClsImooc,"staticMethod","(Ljava/lang/String;)V");
+    if(mtdStaticMethod==NULL){
+        return;
+    }
+//    jboolean isCopy = JNI_FALSE;
+//    LOGD(env->GetStringUTFChars(l,&isCopy));
 }
 
 /*

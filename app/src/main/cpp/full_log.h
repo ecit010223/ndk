@@ -19,7 +19,8 @@
 #define MY_LOG_LEVEL_SILENT 7
 
 #ifndef MY_LOG_TAG
-#define MY_LOG_TAG __FILE__
+//#define MY_LOG_TAG __FILE__
+#define MY_LOG_TAG "alex"
 #endif
 
 #ifndef MY_LOG_LEVEL
