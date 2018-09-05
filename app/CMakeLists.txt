@@ -21,7 +21,10 @@ add_library( # Sets the name of the library.
 			 src/main/cpp/general.cpp 
 			 src/main/cpp/dynamic.cpp 
 			 src/main/cpp/demo_log.cpp
-			 src/main/cpp/basic/refer.cpp)
+			 src/main/cpp/basic/refer.cpp
+			 src/main/cpp/swig/unix.cpp
+			 src/main/cpp/swig/web/shape.cpp
+			 src/main/cpp/swig/plus/plus.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

@@ -45,6 +45,12 @@ JNIEXPORT void JNICALL Java_com_year2018_ndk_jniNative_Imooc_callStaticMethod__I
         return;
     }
     env->CallStaticVoidMethod(clsImooc,mtdStaticMethod,data);
+    // 大多数JNI函数返回局部引用。局部引用不能在后续的调用中被缓存及重用，主要因为它们的使用期限
+    // 仅限于原生方法，一旦原生函数返回，局部引用即被释放，也可以用DeleteLocalRef函数显式释放原
+    // 生代码。
+    // 根据jni的规范，虚拟机应该允许原生代码创建最少16个局部引用。在单个方法调用时进行多个内存
+    // 密集型操作的最佳实践是删除未用的局部引用。如果不能，原生代码可以在使用之前用
+    // EnsureLocalCapacity方法请求更多的局部引用槽。
     env->DeleteLocalRef(clsImooc);
     env->DeleteLocalRef(data);
 }

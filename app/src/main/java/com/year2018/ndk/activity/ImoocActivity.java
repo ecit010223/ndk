@@ -7,8 +7,9 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.year2018.ndk.R;
-import com.year2018.ndk.jniNative.Dynamic;
 import com.year2018.ndk.jniNative.Imooc;
+import com.year2018.ndk.jniNative.swig.unix;
+import com.year2018.ndk.jniNative.swig.web.ClassFactory;
 
 /**
  * Author: zyh
@@ -43,8 +44,10 @@ public class ImoocActivity extends Activity {
 //        mStringBuffer.append(Dynamic.dynamicFromJNI()+"\n");
 //        mStringBuffer.append(Dynamic.logFromJni()+"\n");
 
-        Dynamic.typeTransform();
+//        Dynamic.typeTransform();
 
+        mStringBuffer.append(unix.getuid());
+        ClassFactory classFactory = new ClassFactory();
         ((TextView)findViewById(R.id.tv_imooc_msg)).setText(mStringBuffer);
     }
 }

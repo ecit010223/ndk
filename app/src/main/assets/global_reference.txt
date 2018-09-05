@@ -1,0 +1,18 @@
+1.全局引用
+全局引用在原生方法的后续调用过程上依然有效，除非它们被原生代码显式释放
+// 创建全局引用
+jclass localClz = env->FindClass("java/langString");
+jclass globalClz = env->NewGlobalRef(localClz);
+// 删除全局引用
+env->DeleteGlobalRef(globalClz);
+2.弱全局引用
+与全局引用一样，弱全局引用在原生方法的后续调用过程中依然有效。
+与全局引用不同，弱全局引用并不阻止潜在的对象被垃圾收回。
+// 创建弱全局引用
+jclass weakGlobalClz = env->NewWeakGlobalRef(localClz);
+// 检验一个弱全局引用是否仍然指向活动的类实例
+if(JNI_FALSE == env->IsSameObject(weakGlobalClz,NULL)){
+    // 对象仍然处于活动状态可以使用
+}
+// 删除弱全局引用
+env->DeleteWeakGlobalRef(weakGlobalClz);

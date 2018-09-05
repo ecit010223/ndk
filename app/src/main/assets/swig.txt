@@ -1,0 +1,30 @@
+网页参考：https://www.jianshu.com/p/a91f4e3e20c3
+由已经编写的C++，通过.i生成java
+swig.exe
+    -c++  //指定当前语言是C++还是C，默认是C，只有这两种，没有其他的
+    -java  //生成的包装语言,可以使其他任何一种支持的语言 如-python -csharp
+    -package com.simple.dandelion  //生成的java包名
+    -outdir ./java_simple_wrapper/src/com/simple/dandelion  //java文件的输出目录
+    -o ./java_simple_swig/src/java_dandelion_swig.cxx  //输出的CXX文件的路径文件名
+    -I swig_dandelion.i  //i文件路径
+
+书籍参考：<<Android C++高级编程 使用NDK>>
+由.i文件生成C++代码与Java代码
+swig
+    -java
+    -package com.year2018.ndk.jniNative.swig
+    -outdir  ./java/com/year2018/ndk/jniNative/swig
+    -o ./cpp/swig/unix.cpp
+    -I cpp/swig/unix.i
+
+1.内存管理
+SWIG生成的每个代理类都包含一个名为swigCMemOwn的所有权标志。这个标志指定谁负责清理底层
+C/C++组件。如果底层组件属于这个代理类，回收机制通过Java类的finalize方法来释放内存，也
+可以不用等待回收机制而直接调用Java类的删除方法来释放内存。在运行期间，Java类可以通过
+swigReleaseOwnership释放C/C++底层组件的内存所有权、通过swigTakeOwnership方法取得C/C++
+底层组件的内存所有权。
+2.启动Directors
+%module(directors="1") module_name   //指定模块名 directors="1" 代表可以对C++的类在JAVA中继承
+SWIG用directors特征提供对交叉语言多态性的支持，默认情况下，该特性是禁用的，启用这一特怔，
+需要修改%module预处理指令让它包含directors标志。在启用directors功能之后，要用%feature
+预处理指令将特征应用于某类（见c2j.i）
