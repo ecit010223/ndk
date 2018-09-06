@@ -18,6 +18,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="imooc"/>
+        <Button
+            android:id="@+id/btn_main_thread"
+            style="@style/ViewNormal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/margin_normal"
+            android:text="thread"/>
     </LinearLayout>
 
 </LinearLayout>

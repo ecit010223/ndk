@@ -397,7 +397,7 @@ namespace Swig {
       ~JNIEnvWrapper() {
 #if !defined(SWIG_JAVA_NO_DETACH_CURRENT_THREAD)
         // Some JVMs, eg jdk-1.4.2 and lower on Solaris have a bug and crash with the DetachCurrentThread call.
-        // However, without this call, the JVM hangs on exit when the thread was not created by the JVM and creates a memory leak.
+        // However, without this call, the JVM hangs on exit when the thread was not created by the JVM and creates a memory.txt leak.
         if (env_status == JNI_EDETACHED)
           director_->swig_jvm_->DetachCurrentThread();
 #endif
@@ -658,6 +658,16 @@ namespace Swig {
   }
 }
 
+namespace Swig {
+  namespace {
+    jclass jclass_C2JJNI = NULL;
+    jmethodID director_method_ids[1];
+  }
+}
+
+    #include "../../simple_log.h"
+    #include "async_uid_provider.h"
+
 
 
 /* ---------------------------------------------------
@@ -665,6 +675,76 @@ namespace Swig {
  * --------------------------------------------------- */
 
 #include "c2j.h"
+
+SwigDirector_AsyncUidProvider::SwigDirector_AsyncUidProvider(JNIEnv *jenv) : AsyncUidProvider(), Swig::Director(jenv) {
+}
+
+SwigDirector_AsyncUidProvider::~SwigDirector_AsyncUidProvider() {
+  swig_disconnect_director_self("swigDirectorDisconnect");
+}
+
+
+void SwigDirector_AsyncUidProvider::onUid(uid_t uid) {
+  JNIEnvWrapper swigjnienv(this) ;
+  JNIEnv * jenv = swigjnienv.getJNIEnv() ;
+  jobject swigjobj = (jobject) NULL ;
+  jlong juid  ;
+  
+  if (!swig_override[0]) {
+    AsyncUidProvider::onUid(uid);
+    return;
+  }
+  swigjobj = swig_get_self(jenv);
+  if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
+    juid = (jlong) uid;
+    jenv->CallStaticVoidMethod(Swig::jclass_C2JJNI, Swig::director_method_ids[0], swigjobj, juid);
+    jthrowable swigerror = jenv->ExceptionOccurred();
+    if (swigerror) {
+      jenv->ExceptionClear();
+      throw Swig::DirectorException(jenv, swigerror);
+    }
+    
+  } else {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null upcall object in AsyncUidProvider::onUid ");
+  }
+  if (swigjobj) jenv->DeleteLocalRef(swigjobj);
+}
+
+void SwigDirector_AsyncUidProvider::swig_connect_director(JNIEnv *jenv, jobject jself, jclass jcls, bool swig_mem_own, bool weak_global) {
+  static struct {
+    const char *mname;
+    const char *mdesc;
+    jmethodID base_methid;
+  } methods[] = {
+    {
+      "onUid", "(J)V", NULL 
+    }
+  };
+  
+  static jclass baseclass = 0 ;
+  
+  if (swig_set_self(jenv, jself, swig_mem_own, weak_global)) {
+    if (!baseclass) {
+      baseclass = jenv->FindClass("com/year2018/ndk/jniNative/swig/c2j/AsyncUidProvider");
+      if (!baseclass) return;
+      baseclass = (jclass) jenv->NewGlobalRef(baseclass);
+    }
+    bool derived = (jenv->IsSameObject(baseclass, jcls) ? false : true);
+    for (int i = 0; i < 1; ++i) {
+      if (!methods[i].base_methid) {
+        methods[i].base_methid = jenv->GetMethodID(baseclass, methods[i].mname, methods[i].mdesc);
+        if (!methods[i].base_methid) return;
+      }
+      swig_override[i] = false;
+      if (derived) {
+        jmethodID methid = jenv->GetMethodID(jcls, methods[i].mname, methods[i].mdesc);
+        swig_override[i] = (methid != methods[i].base_methid);
+        jenv->ExceptionClear();
+      }
+    }
+  }
+}
+
 
 
 #ifdef __cplusplus
@@ -677,7 +757,7 @@ SWIGEXPORT jlong JNICALL Java_com_year2018_ndk_jniNative_swig_c2j_C2JJNI_new_1As
   
   (void)jenv;
   (void)jcls;
-  result = (AsyncUidProvider *)new AsyncUidProvider();
+  result = (AsyncUidProvider *)new SwigDirector_AsyncUidProvider(jenv);
   *(AsyncUidProvider **)&jresult = result; 
   return jresult;
 }
@@ -714,6 +794,59 @@ SWIGEXPORT void JNICALL Java_com_year2018_ndk_jniNative_swig_c2j_C2JJNI_AsyncUid
   arg1 = *(AsyncUidProvider **)&jarg1; 
   arg2 = (uid_t)jarg2; 
   (arg1)->onUid(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_com_year2018_ndk_jniNative_swig_c2j_C2JJNI_AsyncUidProvider_1onUidSwigExplicitAsyncUidProvider(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  AsyncUidProvider *arg1 = (AsyncUidProvider *) 0 ;
+  uid_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(AsyncUidProvider **)&jarg1; 
+  arg2 = (uid_t)jarg2; 
+  (arg1)->AsyncUidProvider::onUid(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_com_year2018_ndk_jniNative_swig_c2j_C2JJNI_AsyncUidProvider_1director_1connect(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jswig_mem_own, jboolean jweak_global) {
+  AsyncUidProvider *obj = *((AsyncUidProvider **)&objarg);
+  (void)jcls;
+  SwigDirector_AsyncUidProvider *director = dynamic_cast<SwigDirector_AsyncUidProvider *>(obj);
+  if (director) {
+    director->swig_connect_director(jenv, jself, jenv->GetObjectClass(jself), (jswig_mem_own == JNI_TRUE), (jweak_global == JNI_TRUE));
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_year2018_ndk_jniNative_swig_c2j_C2JJNI_AsyncUidProvider_1change_1ownership(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jtake_or_release) {
+  AsyncUidProvider *obj = *((AsyncUidProvider **)&objarg);
+  SwigDirector_AsyncUidProvider *director = dynamic_cast<SwigDirector_AsyncUidProvider *>(obj);
+  (void)jcls;
+  if (director) {
+    director->swig_java_change_ownership(jenv, jself, jtake_or_release ? true : false);
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_year2018_ndk_jniNative_swig_c2j_C2JJNI_swig_1module_1init(JNIEnv *jenv, jclass jcls) {
+  int i;
+  
+  static struct {
+    const char *method;
+    const char *signature;
+  } methods[1] = {
+    {
+      "SwigDirector_AsyncUidProvider_onUid", "(Lcom/year2018/ndk/jniNative/swig/c2j/AsyncUidProvider;J)V" 
+    }
+  };
+  Swig::jclass_C2JJNI = (jclass) jenv->NewGlobalRef(jcls);
+  if (!Swig::jclass_C2JJNI) return;
+  for (i = 0; i < (int) (sizeof(methods)/sizeof(methods[0])); ++i) {
+    Swig::director_method_ids[i] = jenv->GetStaticMethodID(jcls, methods[i].method, methods[i].signature);
+    if (!Swig::director_method_ids[i]) return;
+  }
 }
 
 

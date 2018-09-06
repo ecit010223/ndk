@@ -8,8 +8,7 @@ import android.widget.TextView;
 
 import com.year2018.ndk.R;
 import com.year2018.ndk.jniNative.Imooc;
-import com.year2018.ndk.jniNative.swig.unix;
-import com.year2018.ndk.jniNative.swig.web.ClassFactory;
+import com.year2018.ndk.jniNative.swig.c2j.UidHandler;
 
 /**
  * Author: zyh
@@ -46,8 +45,12 @@ public class ImoocActivity extends Activity {
 
 //        Dynamic.typeTransform();
 
-        mStringBuffer.append(unix.getuid());
-        ClassFactory classFactory = new ClassFactory();
-        ((TextView)findViewById(R.id.tv_imooc_msg)).setText(mStringBuffer);
+//        ClassFactory classFactory = new ClassFactory();
+
+        UidHandler uidHandler = new UidHandler((TextView)findViewById(R.id.tv_imooc_msg));
+        uidHandler.get();
+
+//        mStringBuffer.append(unix.getuid());
+//        ((TextView)findViewById(R.id.tv_imooc_msg)).setText(mStringBuffer);
     }
 }

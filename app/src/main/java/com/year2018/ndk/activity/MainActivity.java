@@ -3,7 +3,6 @@ package com.year2018.ndk.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 import com.year2018.ndk.R;
 
@@ -21,7 +20,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initUI(){
-        ((Button)findViewById(R.id.btn_main_imooc)).setOnClickListener(this);
+        findViewById(R.id.btn_main_imooc).setOnClickListener(this);
+        findViewById(R.id.btn_main_thread).setOnClickListener(this);
     }
 
     @Override
@@ -29,6 +29,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         switch (view.getId()){
             case R.id.btn_main_imooc:
                 ImoocActivity.entry(this);
+                break;
+            case R.id.btn_main_thread:
+                ThreadActivity.entry(this);
                 break;
         }
     }

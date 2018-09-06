@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             imooc-lib
+			 imooc-lib
 
              # Sets the library as a shared library.
              SHARED
@@ -24,7 +24,23 @@ add_library( # Sets the name of the library.
 			 src/main/cpp/basic/refer.cpp
 			 src/main/cpp/swig/unix.cpp
 			 src/main/cpp/swig/web/shape.cpp
-			 src/main/cpp/swig/plus/plus.cpp)
+			 src/main/cpp/swig/plus/plus.cpp
+			 src/main/cpp/swig/c2j/c2j.cpp
+			 src/main/cpp/ch06/memory_c.c
+			 src/main/cpp/ch06/memory_c_plus.cpp
+			 src/main/cpp/ch06/io.cpp
+			 src/main/cpp/ch06/process.cpp
+			 src/main/cpp/ch06/ch06.cpp
+)
+add_library( # Sets the name of the library.
+			 thread-lib
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+			 src/main/cpp/ch07/ch07.cpp
+)			 
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -49,3 +65,10 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
+					   
+target_link_libraries( # Specifies the target library.
+                       thread-lib
+
+                       # Links the target library to the log library
+                       # included in the NDK.
+                       ${log-lib} )					   

@@ -1,0 +1,14 @@
+Bionic是Android平台为使用C和C++进行原生应用程序开发所提供的POSIX标准C库，这是Google为Android操作
+系统提供的BSD标准C库的衍生库，它由带有可处理线程、进程和信号的定制Linux专用位的混合BSD C库文件片
+组成。
+尽管Bionic是C标准库，但它不以任何方式与其它C库二进制兼容。用其它C库生成的目标文件和静态库不应该与
+Bionic进行动态链接，这么做通常会导致无法链接或无法正确执行你的原生应用程序。
+任何与其它C库静态链接生成的、且不与Bionic混合的应用程序都无可争议地可以在Android平台上运行，除非
+它在运行时动态加载了其它系统库。
+Bionic不会支持所有C标准库的函数。
+Bionic头文件可以放到Android_NDK_HOME目录下的platforms/android-<api-level>/arch-<architecure>/
+usr/include中。该目录下的每个头文件中都包含一个部分，该部分清楚地标明了缺失函数列表，如：
+#if 0 /* 缺失 */
+char *ctermid(char *);
+char *cuserid(char *);
+#endif

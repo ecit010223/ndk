@@ -19,7 +19,8 @@ public:
         {
             return new ShapeProvider();
         }
-    };
+    }
+
     virtual void releaseClass(IShapeProvider* shape_provider)
     {
         delete shape_provider;

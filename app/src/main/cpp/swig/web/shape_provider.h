@@ -21,8 +21,8 @@ public:
     }
 
     virtual std::string toString(){
-
     }
+
 private:
     void initTableInformaction() {}
 

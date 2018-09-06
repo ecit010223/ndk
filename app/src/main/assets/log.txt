@@ -1,0 +1,47 @@
+Android日志框架是名字为logger的内核模块
+Android日志框架把日志消息分成4个日志缓冲区：
+(1) Main：主要应用程序的日志信息
+(2) Event：系统事件
+(3) Radio：Radio相关的日志信息
+(4) System：调试时产生的低级系统调试信息
+logger模块把日志信息放在固定大小的缓冲区。
+Main、Radio和system日志以自由文本的格式保存在64KB的日志缓存区中。
+事件日志信息带有额外的二进制形式信息，因此保存在256KB的日志缓存区中。
+1.原生日志API
+开发者不希望直接与logger内核模块进行交互。Android运行库系统提供了一组API调用以便于Java代码和
+原生代码向logger内核模块发送日志信息。通过android/log.h头文件来展示原生代码的日志API，为了使
+用日志函数，原生代码需要先包含该头文件：
+#include <android.h>
+2.故障处理
+在logcat窗口中将显示堆栈跟踪，如：
+...
+#00 pc 00000c3c
+#01 pc ...
+...
+"#"开头表示调用堆栈，第一行以#00开头，是故障发生的地方。
+"pc"后面跟的数据是代码的地址，如00000c3c，借助正确的工具，这个地址将被用来找到故障发生的确切文件和行号。
+Android NDK带有一个叫做ndk-stack的工具，它能够把堆栈跟踪转换成确切的文件名和行号。
+在命令行方式下进入到项目根目录，执行如下命令：
+adb logcat | ndk-stack = sym obj/local/armeabi
+则在显示的信息中找到:Routine func in jni/hello-jni.c:33
+3.对JNI的扩展检查
+默认情况下，JNI函数基本不做错误检查，错误通常会导致故障。Android为JNI调用提供了一个拓展的检查方式，
+被称之为CheckJNI，当激活该功能时，JavaVM和JNIEnv接口指针切换到函数表，这些函数表在调用实际的实现
+前执行错误检查。
+在常规设备上，在命令行方式下执行以下命令可以启用CheckJNI模式：
+adb shell setprop debug.checkjni 1
+这不影响运行中的应用程序，但是任何后来打开的应用程序都将启用CheckJNI。
+4.内存问题
+(1)使用libc调用模式
+如果使用模拟器，启用libc调试模式就能够诊断出内存问题，启用libc调试模式如下：
+adb shell setprop libc.debug.malloc 1
+adb shell stop
+adb shell start
+支持libc调试模式的值是：
+1：执行泄露探测
+5：填补分配的内存检查超支
+10：填补内存和定点检查超支
+(2)Valgrind
+libc调试模式可以对内存问题做基本的故障诊断，valgrind可以用来进行更高级的内存分析，它是一个用于内
+存调试、内存泄露检测和概要分析的开源工具。
+(3)strace
