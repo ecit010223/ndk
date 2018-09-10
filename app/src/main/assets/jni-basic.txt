@@ -1,0 +1,61 @@
+1.字符串操作
+用给定的C字符串创建Java字符串，即在jni层创建java字符串
+jstring javaString;
+javaString = (*env)->NewStringUTF(env, "hello world!");
+或：NewString（）
+将Java字符串转换成C字符串
+GetStringChars()
+//生成native层的指针
+GetStringUTFChars()
+const char * c_str = (*env)->GetStringUTFChars(env, str, NULL);
+//str为java层传递过来的字符串
+ReleaseStringChars()
+//释放native层的指针
+ReleaseStringUTFChars()
+(*env>->ReleaseStringUTFChars(env, str, c_str);
+
+2.数组操作
+New<Type>Array()，如：NewIntArray(env,10);
+数组处理的方式有两种：
+(1)方式一：生成native层的数据拷贝。
+Get<Type>ArrayRegion()，将给定的基本Java数组复制给定的C数组中
+jint nativeArray[5];
+(*env)->GetIntArrayRegion(env, array,0,5,nativeArray);
+// array为java层传递过来的数组
+// 0, 5：表示从下标0开始，长度为5
+//nativeArray：拷贝的目的jni层数组
+Set<Type>ArrayRegion()，将C数组复制回Java数组中
+(*env)->SetIntArrayRegion(env,array,0,5,nativeArray);
+return array; //将java层数组返回
+(2)方式二：直接调用数据指针进行操作。
+Get<Type>ArrayElements()，获取指向数组元素的直接指针
+Release<Type>ArrayElements()，释放上面返回的C数组
+jint* data = (*env)->GetIntArrayElements(env,array,NULL);
+jsize len = (*env)->GetArrayLength(env,array);
+int j;
+for(j=0;j<len;j++){
+	data[j] += 3;
+}
+(*env)->ReleaseIntArrayElements(env,array,data,0);
+return array;
+
+3.方法签名规则：基本类型
+boolean：z
+byte：   B
+char：   C
+short：  s
+int：    I
+long：   J
+float：  F
+double： D
+void：   V
+如果是类类型，表示方式是：L + 类全名（包名中的点“.”用“/”代替） +；比如：
+java.lang.String对应的是：Ljava/lang/String;
+如果是数组，则在前面加“[”，然后加类型签名，几个数组就加几个“[”，比如：
+int[] 对应：[I
+boolean[][]对应：[[Z
+java.lang.Class[]对应：[Ljava/lang/Class;
+
+4.查看方法签名
+terminal窗口下进入：app/build/intermediates/classes/debug目录
+输入：javap –s com.year18.imooc_ndk.MainActivity，生成签名信息

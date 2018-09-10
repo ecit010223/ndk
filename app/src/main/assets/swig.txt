@@ -23,6 +23,7 @@ C/C++组件。如果底层组件属于这个代理类，回收机制通过Java�
 可以不用等待回收机制而直接调用Java类的删除方法来释放内存。在运行期间，Java类可以通过
 swigReleaseOwnership释放C/C++底层组件的内存所有权、通过swigTakeOwnership方法取得C/C++
 底层组件的内存所有权。
+
 2.启动Directors
 %module(directors="1") module_name   //指定模块名 directors="1" 代表可以对C++的类在JAVA中继承
 SWIG用directors特征提供对交叉语言多态性的支持，默认情况下，该特性是禁用的，启用这一特怔，

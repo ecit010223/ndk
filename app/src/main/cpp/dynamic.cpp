@@ -39,9 +39,14 @@ static JNINativeMethod jniMethods[] = {
                 (void *)native_log
         },
         {
-                "typeTransform",
+                "basicJniStatic",
                 "()V",
-                (void *)type_transform
+                (void *)basicJniStatic
+        },
+        {
+                "basicJni",
+                "()V",
+                (void *)basicJni
         }
 };
 

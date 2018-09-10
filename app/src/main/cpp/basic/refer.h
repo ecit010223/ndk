@@ -11,7 +11,8 @@
 extern "C" {
 #endif
 
-void type_transform(JNIEnv *,jclass);
+void basicJniStatic(JNIEnv *,jclass);
+void basicJni(JNIEnv*,jobject);
 
 #ifdef __cplusplus
 }

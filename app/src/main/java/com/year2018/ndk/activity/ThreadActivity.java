@@ -74,7 +74,6 @@ public class ThreadActivity extends Activity {
      */
     private static int getNumber(EditText editText, int defaultValue) {
         int value;
-
         try {
             value = Integer.parseInt(editText.getText().toString());
         } catch (NumberFormatException e) {
@@ -102,8 +101,7 @@ public class ThreadActivity extends Activity {
     private native void nativeFree();
 
     /**
-     * Native worker.
-     *
+     * 模拟执行时间较长的任务
      * @param id worker id.
      * @param iterations iteration count.
      */
@@ -118,10 +116,10 @@ public class ThreadActivity extends Activity {
     private native void posixThreads(int threads, int iterations);
 
     /**
-     * Using Java based threads.
+     * 初始方案：使用java层的线程
      *
-     * @param threads thread count.
-     * @param iterations iteration count.
+     * @param threads 线程数
+     * @param iterations 每个线程的运行迭代数
      */
     private void javaThreads(int threads, final int iterations) {
         // Create a Java based thread for each worker

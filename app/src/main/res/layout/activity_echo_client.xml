@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/et_echo_ip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="IP Address">
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/et_echo_port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Port Number"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/et_echo_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Message" />
+
+    <Button
+        android:id="@+id/btn_echo_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Client" />
+
+    <ScrollView
+        android:id="@+id/sv_echo_log"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0">
+
+        <TextView
+            android:id="@+id/tv_echo_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+</LinearLayout>

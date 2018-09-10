@@ -9,68 +9,56 @@
  *  Created by zyh on 2018/9/6.
  */
 
-// Native worker thread arguments
+// 原生worker线程参数
 struct NativeWorkerArgs {
     jint id;
     jint iterations;
 };
 
-// Method ID can be cached
+// 被缓存的方法ID
 static jmethodID gOnNativeMessage = NULL;
 
-// Java VM interface pointer
+// Java虚拟机接口指针
 static JavaVM* gVm = NULL;
 
-// Global reference to object
+// 对象的全局引用
 static jobject gObj = NULL;
 
-// Mutex instance
+// 互斥实例
 static pthread_mutex_t mutex;
 
-void nativeInit (JNIEnv* env,jobject obj)
-{
-    // Initialize mutex
-    if (0 != pthread_mutex_init(&mutex, NULL))
-    {
-        // Get the exception class
-        jclass exceptionClazz = env->FindClass(
-                "java/lang/RuntimeException");
+void nativeInit (JNIEnv* env,jobject obj) {
+    // 初始化互斥
+    if (0 != pthread_mutex_init(&mutex, NULL)){
+        // 获取异常类
+        jclass exceptionClazz = env->FindClass("java/lang/RuntimeException");
 
-        // Throw exception
+        // 抛出异常
         env->ThrowNew(exceptionClazz, "Unable to initialize mutex");
         goto exit;
     }
 
-    // If object global reference is not set
-    if (NULL == gObj)
-    {
-        // Create a new global reference for the object
+    // 如果回调至UI的Java对象未被设置为全局引用
+    if (NULL == gObj){
+        // 为对象创建一个新的全局引用
         gObj = env->NewGlobalRef(obj);
-
-        if (NULL == gObj)
-        {
+        if (NULL == gObj) {
             goto exit;
         }
     }
 
-    // If method ID is not cached
-    if (NULL == gOnNativeMessage)
-    {
+    // 如果UI回调方法未缓存
+    if (NULL == gOnNativeMessage) {
         // Get the class from the object
         jclass clazz = env->GetObjectClass(obj);
 
         // Get the method id for the callback
-        gOnNativeMessage = env->GetMethodID(clazz,
-                                            "onNativeMessage",
-                                            "(Ljava/lang/String;)V");
+        gOnNativeMessage = env->GetMethodID(clazz,"onNativeMessage","(Ljava/lang/String;)V");
 
         // If method could not be found
-        if (NULL == gOnNativeMessage)
-        {
+        if (NULL == gOnNativeMessage) {
             // Get the exception class
-            jclass exceptionClazz = env->FindClass(
-                    "java/lang/RuntimeException");
-
+            jclass exceptionClazz = env->FindClass("java/lang/RuntimeException");
             // Throw exception
             env->ThrowNew(exceptionClazz, "Unable to find method");
         }
@@ -80,47 +68,37 @@ void nativeInit (JNIEnv* env,jobject obj)
     return;
 }
 
-void nativeFree (
-        JNIEnv* env,
-        jobject obj)
-{
-    // If object global reference is set
-    if (NULL != gObj)
-    {
-        // Delete the global reference
+void nativeFree (JNIEnv* env, jobject obj) {
+    // 如果对象的全局引用已经设置
+    if (NULL != gObj) {
+        // 删除全局引用
         env->DeleteGlobalRef(gObj);
         gObj = NULL;
     }
 
-    // Destory mutex
-    if (0 != pthread_mutex_destroy(&mutex))
-    {
-        // Get the exception class
-        jclass exceptionClazz = env->FindClass(
-                "java/lang/RuntimeException");
+    // 销毁互斥锁
+    if (0 != pthread_mutex_destroy(&mutex)) {
+        // 获取异常类
+        jclass exceptionClazz = env->FindClass("java/lang/RuntimeException");
 
-        // Throw exception
+        // 抛出异常
         env->ThrowNew(exceptionClazz, "Unable to destroy mutex");
     }
 }
 
-void nativeWorker (JNIEnv* env,jobject obj,jint id,jint iterations)
-{
-    // Lock mutex
-    if (0 != pthread_mutex_lock(&mutex))
-    {
-        // Get the exception class
-        jclass exceptionClazz = env->FindClass(
-                "java/lang/RuntimeException");
+void nativeWorker (JNIEnv* env,jobject obj,jint id,jint iterations){
+    // 锁定互斥锁
+    if (0 != pthread_mutex_lock(&mutex)) {
+        // 获取异常类
+        jclass exceptionClazz = env->FindClass("java/lang/RuntimeException");
 
-        // Throw exception
+        // 抛出异常
         env->ThrowNew(exceptionClazz, "Unable to lock mutex");
         goto exit;
     }
 
     // Loop for given number of iterations
-    for (jint i = 0; i < iterations; i++)
-    {
+    for (jint i = 0; i < iterations; i++){
         // Prepare message
         char message[26];
         sprintf(message, "Worker %d: Iteration %d", id, i);
@@ -139,14 +117,12 @@ void nativeWorker (JNIEnv* env,jobject obj,jint id,jint iterations)
         sleep(1);
     }
 
-    // Unlock mutex
-    if (0 != pthread_mutex_unlock(&mutex))
-    {
-        // Get the exception class
-        jclass exceptionClazz = env->FindClass(
-                "java/lang/RuntimeException");
+    // 解锁互斥锁
+    if (0 != pthread_mutex_unlock(&mutex)){
+        // 获取异常类
+        jclass exceptionClazz = env->FindClass("java/lang/RuntimeException");
 
-        // Throw exception
+        // 抛出异常
         env->ThrowNew(exceptionClazz, "Unable to unlock mutex");
     }
 
@@ -154,60 +130,87 @@ void nativeWorker (JNIEnv* env,jobject obj,jint id,jint iterations)
     return;
 }
 
-static void* nativeWorkerThread (void* args)
-{
+/** 原生线程执行函数 **/
+static void* nativeWorkerThread (void* args){
     JNIEnv* env = NULL;
 
-    // Attach current thread to Java virtual machine
-    // and obrain JNIEnv interface pointer
-    if (0 == gVm->AttachCurrentThread(&env, NULL))
-    {
-        // Get the native worker thread arguments
+    //将当前线程附加到Java虚拟机上，并且获得JNIEnv接口指针
+    if (0 == gVm->AttachCurrentThread(&env, NULL)){
+        // 获取原生worker线程参数
         NativeWorkerArgs* nativeWorkerArgs = (NativeWorkerArgs*) args;
 
-        // Run the native worker in thread context
+        // 在线程上下文中运行原生worker
         nativeWorker(env,gObj,nativeWorkerArgs->id,nativeWorkerArgs->iterations);
 
-        // Free the native worker thread arguments
+        // 释放原生worker线程参数
         delete nativeWorkerArgs;
 
-        // Detach current thread from Java virtual machine
+        // 从Java虚拟机中分离当前线程
         gVm->DetachCurrentThread();
     }
 
     return (void*) 1;
 }
 
-void posixThreads (JNIEnv* env,jobject obj,jint threads,jint iterations)
-{
-    // Create a POSIX thread for each worker
-    for (jint i = 0; i < threads; i++)
-    {
-        // Thread handle
+/**
+ * TODO中内容为后加，添加后UI界面的更新会等到线程执行结束后
+ * @param env
+ * @param obj
+ * @param threads
+ * @param iterations
+ */
+void posixThreads (JNIEnv* env,jobject obj,jint threads,jint iterations){
+    //TODO 线程句柄
+    pthread_t* handles = new pthread_t[threads];
+
+    // 为每个worker创建一个POSIX线程
+    for (jint i = 0; i < threads; i++){
+        // 原生worker线程参数
         pthread_t thread;
 
-        // Native worker thread arguments
+        // 原生worker线程参数
         NativeWorkerArgs* nativeWorkerArgs = new NativeWorkerArgs();
         nativeWorkerArgs->id = i;
         nativeWorkerArgs->iterations = iterations;
 
-        // Create a new thread
-        int result = pthread_create(
-                &thread,
-                NULL,
-                nativeWorkerThread,
-                (void*) nativeWorkerArgs);
+        // 创建新线程
+//        int result = pthread_create(&thread,NULL,nativeWorkerThread,(void*) nativeWorkerArgs);
+        int result = pthread_create(&handles[i],NULL,nativeWorkerThread,(void*) nativeWorkerArgs);
 
-        if (0 != result)
-        {
-            // Get the exception class
-            jclass exceptionClazz = env->FindClass(
-                    "java/lang/RuntimeException");
+        if (0 != result){
+            // 获取异常类
+            jclass exceptionClazz = env->FindClass("java/lang/RuntimeException");
 
-            // Throw exception
+            // 抛出异常
             env->ThrowNew(exceptionClazz, "Unable to create thread");
+            //TODO
+            goto exit;
         }
     }
+    //TODO 等待线程终止
+    for(jint i=0;i<threads;i++){
+        void* result = NULL;
+        //连接每个线程句柄
+        if(0!=pthread_join(handles[i],&result)){
+            //获取异常类
+            jclass exceptionClazz = env->FindClass("java/lang/RuntimeException");
+            //抛出异常
+            env->ThrowNew(exceptionClazz,"Unable to join thread");
+        }else{
+            //准备message
+            char message[26];
+            sprintf(message,"Worker %d returned %d",i,result);
+            //来自C字符串的message
+            jstring messageString = env->NewStringUTF(message);
+            env->CallVoidMethod(obj,gOnNativeMessage,messageString);
+            //检查是否产生异常
+            if(NULL != env->ExceptionOccurred()){
+                goto exit;
+            }
+        }
+    }
+    exit:
+        return;
 }
 
 /**
@@ -230,11 +233,12 @@ static JNINativeMethod jniMethods[] = {
                 "()V",
                 (void *)nativeFree
         },
-        {
-                "nativeWorker",
-                "(II)V",
-                (void *)nativeWorker
-        },
+        //当使用java层的线程运行时取消注释
+//        {
+//                "nativeWorker",
+//                "(II)V",
+//                (void *)nativeWorker
+//        },
         {
                 "posixThreads",
                 "(II)V",
@@ -243,7 +247,7 @@ static JNINativeMethod jniMethods[] = {
 };
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm,void *reserved){
-    // Cache the JavaVM interface pointer
+    // 缓存Java虚拟机接口指针
     gVm = jvm;
 
     JNIEnv *env = NULL;

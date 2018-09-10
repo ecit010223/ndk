@@ -1,0 +1,66 @@
+1.生成头文件
+javah
+–classpath bin/classes   //class目录，java文件编译后生成的class文件存放目录
+–d jni //输出的目录
+com.year18.imooc_ndk.MainActivity    //包名加类名，该类包含native函数
+//如果该命令报找不到Activity文件，则可以将android.jar包引入，引入方式则将-classpath修改为：
+-classpath bin/classes <android sdk目录>\platforms\android-16\android.jar
+
+2.生成头文件(Android Studio)
+(1)打开Terminal
+(2)通过cd命令将当前路径切换为\app\src\main\java
+(3)输入命令：
+javah –d ../jni com.year18.imooc_ndk.Hello
+//如出现错误：编码GBK的不可映射字符
+javah -d ../jni -encoding UTF-8 com.year18.imooc_ndk.Hello
+
+3.CMakeLists.txt
+可在defaultConfig结点下添加如下内容来指定C++版本：
+externalNativeBuild {
+	cmake {
+		cppFlags "-std=c++14"
+	}
+}
+
+4.extern “C”
+extern “C”声明告诉编译器“{}”包围的代码应该按照C语言的语法进行编译
+这是因为C++比C多了很多语言上的特性，比如C++支持函数重载，但是C语言不支持，所以编译器对C++函数
+和C函数的签名形式不一样，编译器在编译C++函数的时候，会用函数名和函数形参结合的形式作为函数签名，
+编译C函数只会使用函数名作为函数签名，那么如果存在C++和C之间的函数调用，链接器在查找调用的函数
+时就找不到相同函数签名的函数。
+extern “C”声明就告诉编译器它声明的函数按照C语言的风格进行函数签名，那么不管C调用C++函数，还是
+C++调用C函数，被extern “C”声明的函数具有相同的函数签名，链接器就能够找到所调用的函数。
+声明一个代码块：
+extern “C”{
+	int add(int, int);
+	int max(int, int);
+}
+只声明一个函数：
+extern“C”int add(int, int)
+extern "C" JNIEXPORT jstring
+
+5.JNIEXPORT和JNICALL
+JNICALL表示调用约定，相当于C++的stdcall，说明调用的是本地方法。
+JNIEXPORT表示函数的链接方式，当程序执行的时候从本地库文件中找函数。
+
+6.jni.h
+jni.h的存放目录：ndk目录/platforms/android-version/arch-arm/usr/include下
+
+7.链接库
+(1)静态链接库
+将程序所依赖的静态库文件全部编译到该程序文件中，编译成一个文件，编译后的文件的体积会比较大。
+编译后的文件都-a结束。
+优点：可以将编译后的文件迁移到其它地方。
+(2)动态链接库
+不编译成一个文件，而是在运行期间查找所依赖的库文件，编译时只编译自己的代码，因此编译后的文
+件体积较小，缺点是程序在运行期间可能会找不到依赖的库文件。
+
+8.ABI
+Application Binary Interface，应用程序二进制接口，定义了二进制文件（尤其是.so文件）如何运行在相
+应的系统平台上，从使用的指令集、内存对齐到可用的系统函数库。在Android系统上，每一个CPU架构对应一
+个ABI：armeabi、armeabi-v7a、x86、mips、arm64-v8a、mips64、x86_64。
+abi用来将C文件转换成可运行在各个平台上的so文件。手机的CPU架构有多种，如arm、x86等，每种架构所能
+执行的so文件不一样。
+很多设备都支持多于一种ABI。例如ARM64和x86设备也可以同时运行armeabi-v7a和armeabi的二进制包。但最
+好是针对特定平台提供相应平台的二进制包，这种情况下运行时就少了一个模拟层（例如x86设备上模拟arm的
+虚拟层），从而得到更好的性能（归功于最近的架构更新，例如硬件fpu，更多的寄存器，更好的向量化等）。

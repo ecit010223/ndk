@@ -7,11 +7,13 @@ Android日志框架把日志消息分成4个日志缓冲区：
 logger模块把日志信息放在固定大小的缓冲区。
 Main、Radio和system日志以自由文本的格式保存在64KB的日志缓存区中。
 事件日志信息带有额外的二进制形式信息，因此保存在256KB的日志缓存区中。
+
 1.原生日志API
 开发者不希望直接与logger内核模块进行交互。Android运行库系统提供了一组API调用以便于Java代码和
 原生代码向logger内核模块发送日志信息。通过android/log.h头文件来展示原生代码的日志API，为了使
 用日志函数，原生代码需要先包含该头文件：
 #include <android.h>
+
 2.故障处理
 在logcat窗口中将显示堆栈跟踪，如：
 ...
@@ -24,6 +26,7 @@ Android NDK带有一个叫做ndk-stack的工具，它能够把堆栈跟踪转换
 在命令行方式下进入到项目根目录，执行如下命令：
 adb logcat | ndk-stack = sym obj/local/armeabi
 则在显示的信息中找到:Routine func in jni/hello-jni.c:33
+
 3.对JNI的扩展检查
 默认情况下，JNI函数基本不做错误检查，错误通常会导致故障。Android为JNI调用提供了一个拓展的检查方式，
 被称之为CheckJNI，当激活该功能时，JavaVM和JNIEnv接口指针切换到函数表，这些函数表在调用实际的实现
@@ -31,6 +34,7 @@ adb logcat | ndk-stack = sym obj/local/armeabi
 在常规设备上，在命令行方式下执行以下命令可以启用CheckJNI模式：
 adb shell setprop debug.checkjni 1
 这不影响运行中的应用程序，但是任何后来打开的应用程序都将启用CheckJNI。
+
 4.内存问题
 (1)使用libc调用模式
 如果使用模拟器，启用libc调试模式就能够诊断出内存问题，启用libc调试模式如下：
