@@ -1,5 +1,7 @@
-package com.year2018.ndk.activity.ch08;
+package com.year2018.ndk.activity.socket;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
@@ -15,9 +17,19 @@ public class EchoClientActivity extends AbstractEchoActivity {
     /** 消息编辑 **/
     private EditText mEtMessage;
 
-    public EchoClientActivity() {
-        super(R.layout.activity_echo_client);
+    public static final void entry(Context from){
+        Intent intent = new Intent(from,EchoClientActivity.class);
+        from.startActivity(intent);
     }
+
+    @Override
+    protected int getLayoutID() {
+        return R.layout.activity_echo_client;
+    }
+
+    //    public EchoClientActivity() {
+//        super(R.layout.activity_echo_client);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

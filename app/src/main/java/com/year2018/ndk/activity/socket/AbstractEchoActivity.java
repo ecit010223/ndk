@@ -1,8 +1,9 @@
-package com.year2018.ndk.activity.ch08;
+package com.year2018.ndk.activity.socket;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +18,7 @@ import com.year2018.ndk.R;
  */
 public abstract class AbstractEchoActivity extends Activity implements View.OnClickListener {
     /** 布局ID **/
-    private final int mLayoutID;
+//    private final int mLayoutID;
     /** 端口号 **/
     protected EditText mEtPort;
     /** 服务按钮 **/
@@ -27,14 +28,14 @@ public abstract class AbstractEchoActivity extends Activity implements View.OnCl
     /** 日志视图 **/
     protected TextView mTvLog;
 
-    public AbstractEchoActivity(int layoutID){
-        this.mLayoutID = layoutID;
-    }
+//    public AbstractEchoActivity(int layoutID){
+//        this.mLayoutID = layoutID;
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(mLayoutID);
+        setContentView(getLayoutID());
 
         mEtPort = findViewById(R.id.et_echo_port);
         mBtnStart = findViewById(R.id.btn_echo_start);
@@ -42,6 +43,8 @@ public abstract class AbstractEchoActivity extends Activity implements View.OnCl
         mSvLog = findViewById(R.id.sv_echo_log);
         mTvLog = findViewById(R.id.tv_echo_log);
     }
+
+    protected abstract int getLayoutID();
 
     @Override
     public void onClick(View view) {
@@ -97,7 +100,7 @@ public abstract class AbstractEchoActivity extends Activity implements View.OnCl
         private final Handler handler;
 
         public AbstractEchoTask(){
-            handler = new Handler();
+            handler = new Handler(Looper.getMainLooper());
         }
 
         /** 在调用线程中先执行回调 **/
@@ -131,6 +134,6 @@ public abstract class AbstractEchoActivity extends Activity implements View.OnCl
         }
     }
     static {
-        System.loadLibrary("echo-lib");
+        System.loadLibrary("socket-lib");
     }
 }

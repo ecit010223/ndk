@@ -1,0 +1,97 @@
+1.va_list
+是在C语言中解决问题的一组宏，变参问题是指参数的个数不定，可以是传入一个参数也可以是多个；可变参数中的每个
+参数的类型可以不同，也可以相同；可变参数的每个参数并没有实际的名称与之相对应。
+#include<stdarg.h>
+int AveInt(int,...);
+void main(){
+    printf("%d/t",AveInt(2,2,3));
+    printf("%d\t",AveInt(4,2,4,6,8));
+    return;
+}
+int AveInt(int v,...){
+    int returnValue = 0;
+    int i=v;
+    va_list ap;
+    //初始化变量ap
+    va_start(ap,v);
+    while(i>0){
+        //返回可变的参数，int用于指定要返回的参数类型，如果有多个可变参数，依次调用va_arg获取各个参数
+        returnValue = va_arg(ap,int);
+        i--;
+    }
+    //结束可变参数的获取
+    va_end(ap);
+    return returnValue /= v;
+}
+
+2.vsnprintf
+将可变参数格式化输出到一个字符数组
+int vsnprintf(char* str, size_t size,const char* format, va_list ap)
+str：把生成的格式化的字符串存放在这里
+size：str可接收的最大字符数
+fromat：指定输出格式的字符串，它决定了需要提供的可变参数的类型、个数和顺序
+#include <stdio.h>
+#include <stdarg.h>
+#define MAX_LEN 10
+int mon_log(char* format, ...){
+    char str_tmp[MAX_LEN];
+    int i=0,j=0;
+    va_list vArgList;
+    va_start(vArgList,format);
+    // vsnprintf会自动在写入字符的后面加上停止符\0。如下str_tmp最大10个字符，在写入9个后自动添加\0
+    // i为写入的个数
+    i = vsnprintf(str_tmp,MAX_LEN,format,vArgList);
+    va_end(vArgList);
+    printf("%s",str_tmp);
+    for(j=0;j<MAX_LEN;j++){
+        printf("%d ",str_tmp[j]);
+    }
+    printf("\n");
+    return i;
+}
+void main(){
+    int i = mon_log("%s,%d,%d,%c","abc",2,3,'\n');
+    printf("%d\n",i);
+    i = mon_log("%s,%d,%d,%c","abcd",2,3,'\n');
+    printf("%d\n",i);
+    i = mon_log("%s,%d,%d,%c","abcde",2,3,'\n');
+    printf("%d\n",i);
+}
+
+3.memset
+memset(void *s,int ch,size_t n)
+将s所指向的某一块内存中后n字节的内容全部设置为ch指定的ASCII值。
+s：指定的内存地址，块的大小第三个参数指定。
+这个函数通常为新申请的内存做初始化工作，其返回值为s。
+
+4.htonl
+将主机数转换成无符号长整型的网络字节顺序，即将一个32位数从主机字节序列转换成网络字节顺序。
+返回一个网络字节顺序。
+
+5.ntohl
+将网络字节排序转换成主机字节排序
+
+6.INADDR_ANY
+INADDR_ANY就是指地址为0.0.0.0的地址。
+
+7.htons
+将端口转换为网络字符顺序
+
+8.ntohs
+网络字节顺序转换为主机字节顺序
+
+8.getsockname
+getsockname(SOCKET s,struct sockaddr FAR* name, int FAR* nameLen)
+获取一个套接字，特别适用于：未调用bind()就调用了connect()，这时唯有getsockname()调用可以获知系统内定
+的本地地址。
+s：标识一个已捆绑套接口的描述符
+name：接收套接口的地址（名字）
+namelen：名字缓冲区长度
+若无错误发生，getsockname()返回0。否则的话，返回SOCKET_ERROR错误，应用程序可通过WSAGetLastError()获
+取相应错误代码。
+
+9.inet_aton
+将一个字符串IP地址转换为一个32位的网络序列IP地址
+int inet_aton(const char *string, struct in_addr* addr)
+string：ASCII表示的IP地址
+addr：将要用新的IP地址更新的结构。

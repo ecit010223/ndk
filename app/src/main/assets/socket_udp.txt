@@ -1,0 +1,25 @@
+1.从socket接收数据
+ssize_t recvfrom(int socketDescriptor,void* buffer, size_t bufferLength,int flags,
+        struct sockaddr* address,socklen_t* addressLength)
+阻塞函数，如果没从给定的socket接收到数据，它会使调用进程进入挂起状态，直到接收到可用数据。
+socketDescriptor：指定应用程序想要从中接收数据的socket实例
+buffer：指向内存地址的指针，该内存用来保存从socket接收的数据
+bufferLength：指定缓冲区的大小，recvfrom函数只会向缓冲区中写入该参数指定大小的内容然后返回
+flags：指定接收所需要的额外标志
+address：指定一个地址结构，用于保存客户端发送包的协议地址，如果应用程序不需要该信息，将该参数置为NULL
+addressLength：指定客户端要写入协议的内存空间大小，如果应用程序不需要该信息，将该参数置为NULL
+如果recvfrom函数成功，将返回从socket处接收到的字节数；否则返回-1且全局变量errno将被设置为相应的错误。
+如果该函数返回0，表示socket连接失败。
+
+2.向socket发送数据
+ssize_t sendto(int socketDescriptor,const void* buffer,size_t bufferSize,int flag,
+        const struct sockaddr* address, socklen_t addressLength)
+也是一个阻塞函数，如果socket在忙着发送数据，它会使调用进程进入挂起状态直到socket可以传输数据。
+socketDescriptor：指定应用程序想要向其发送数据的socket实例
+buffer：指向内存地址的buffer指针，该内存是给定的socket发送数据的目的地
+bufferSize：指定缓冲区的大小，sendto函数只会向缓冲区传输该参数所指定大小的数据然后返回
+flags：指定发送所需要的额外标志
+address：指定目标服务器的协议地址
+addressLength：传递给函数的协议地址结构的大小
+如果发送成功，sendto函数会返回传送的字节数，否则返回-1且全局变量errno将被设置为相应的错误。如果该函数返
+回0，表示socket连接失败。

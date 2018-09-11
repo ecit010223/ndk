@@ -1,4 +1,4 @@
-package com.year2018.ndk.activity.ch08;
+package com.year2018.ndk.activity.socket;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +16,14 @@ public class EchoServerActivity extends AbstractEchoActivity {
         from.startActivity(intent);
     }
 
-    public EchoServerActivity() {
-        super(R.layout.activity_echo_server);
+    @Override
+    protected int getLayoutID() {
+        return R.layout.activity_echo_server;
     }
+
+    //    public EchoServerActivity() {
+//        super(R.layout.activity_echo_server);
+//    }
 
     @Override
     protected void onStartButtonClicked() {

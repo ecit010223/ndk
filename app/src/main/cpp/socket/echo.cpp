@@ -4,9 +4,9 @@
 //JNI
 #include <jni.h>
 #include <string>
-#include "com_year2018_ndk_activity_ch08_EchoClientActivity.h"
-#include "com_year2018_ndk_activity_ch08_EchoServerActivity.h"
-#include "com_year2018_ndk_activity_ch08_EchoLocalActivity.h"
+#include "com_year2018_ndk_activity_socket_EchoClientActivity.h"
+#include "com_year2018_ndk_activity_socket_EchoServerActivity.h"
+#include "com_year2018_ndk_activity_socket_EchoLocalActivity.h"
 //NULL
 #include <stdio.h>
 //va_list, vsnprintf
@@ -40,17 +40,17 @@
  */
 static void LogMessage(JNIEnv *env, jobject obj, const char *format, ...) {
     //缓存日志方法ID
-    static jmethodID methodID = NULL;
+    static jmethodID mthLogMessageID = NULL;
     //如果方法ID未缓存
-    if (NULL == methodID) {
+    if (NULL == mthLogMessageID) {
         //从对象获取类
         jclass clazz = env->GetObjectClass(obj);
         //从给定方法获取方法ID
-        methodID = env->GetMethodID(clazz, "logMessage", "(Ljava/lang/String;)V");
+        mthLogMessageID = env->GetMethodID(clazz, "logMessage", "(Ljava/lang/String;)V");
         //释放类引用
         env->DeleteLocalRef(clazz);
     }
-    if (NULL != methodID) {
+    if (NULL != mthLogMessageID) {
         //格式化日志消息
         char buffer[MAX_LOG_MESSAGE_LENGTH];
         va_list ap;
@@ -63,7 +63,7 @@ static void LogMessage(JNIEnv *env, jobject obj, const char *format, ...) {
         //如果字符串构造正确
         if (NULL != message) {
             //记录消息
-            env->CallVoidMethod(obj, methodID, message);
+            env->CallVoidMethod(obj, mthLogMessageID, message);
             //释放消息引用
             env->DeleteLocalRef(message);
         }
@@ -76,10 +76,7 @@ static void LogMessage(JNIEnv *env, jobject obj, const char *format, ...) {
  * @param className
  * @param message 要输出的异常信息
  */
-static void ThrowException(
-        JNIEnv *env,
-        const char *className,
-        const char *message) {
+static void ThrowException(JNIEnv *env, const char *className, const char *message) {
     //获取异常类
     jclass clazz = env->FindClass(className);
     if (NULL != clazz) {
@@ -94,12 +91,12 @@ static void ThrowException(
  * 用给定异常类和错误号的错误消息抛出新异常
  * @param env
  * @param className
- * @param errnum 异常编号
+ * @param errNum 异常编号
  */
-static void ThrowErrnoException(JNIEnv *env, const char *className, int errnum) {
+static void ThrowErrnoException(JNIEnv *env, const char *className, int errNum) {
     char buffer[MAX_LOG_MESSAGE_LENGTH];
     //获取错误号消息
-    if (-1 == strerror_r(errnum, buffer, MAX_LOG_MESSAGE_LENGTH)) {
+    if (-1 == strerror_r(errNum, buffer, MAX_LOG_MESSAGE_LENGTH)) {
         //根据异常编号打印异常信息
         strerror_r(errno, buffer, MAX_LOG_MESSAGE_LENGTH);
     }
@@ -141,7 +138,7 @@ static void BindSocketToPort(JNIEnv *env, jobject obj, int sd, unsigned short po
     //绑定到所有地址
     address.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    //将端口转换为网络字节顺序
+    //将端口转换为网络字节顺序，如果将端口设置为0，bind函数会将第一个端口号分配给socket
     address.sin_port = htonl(port);
 
     // 绑定socket
@@ -186,9 +183,7 @@ static unsigned short GetSocketPort(JNIEnv *env, jobject obj, int sd) {
  */
 static void ListenOnSocket(JNIEnv *env, jobject obj, int sd, int backlog) {
     //监听给定backlog的socket
-    LogMessage(env, obj,
-               "Listening on socket with a backlog of %d pending connections.",
-               backlog);
+    LogMessage(env, obj,"Listening on socket with a backlog of %d pending connections.",backlog);
     if (-1 == listen(sd, backlog)) {
         //抛出带错误
         ThrowErrnoException(env, "java/io/IOException", errno);
@@ -202,13 +197,10 @@ static void ListenOnSocket(JNIEnv *env, jobject obj, int sd, int backlog) {
  * @param message
  * @param address
  */
-static void LogAddress(
-        JNIEnv *env,
-        jobject obj,
-        const char *message,
-        const struct sockaddr_in *address) {
+static void LogAddress(JNIEnv *env,jobject obj,const char *message,
+                       const struct sockaddr_in *address) {
     char ip[INET_ADDRSTRLEN];
-    //将IP地址转换为字符串
+    //将IP地址转换为字符串，存储在ip中，且长度为INET_ADDRSTRLEN
     if (NULL == inet_ntop(PF_INET, &(address->sin_addr), ip, INET_ADDRSTRLEN)) {
         //抛出带错误号的异常
         ThrowErrnoException(env, "java/io/IOException", errno);
@@ -254,12 +246,7 @@ static int AcceptOnSocket(JNIEnv *env, jobject obj, int sd) {
  * @param bufferSize buffer size
  * @return receive size
  */
-static ssize_t ReceiveFromSocket(
-        JNIEnv *env,
-        jobject obj,
-        int sd,
-        char *buffer,
-        size_t bufferSize) {
+static ssize_t ReceiveFromSocket(JNIEnv *env,jobject obj,int sd,char *buffer,size_t bufferSize) {
     // 阻塞并接收来自socket的数据放到缓冲区
     LogMessage(env, obj, "Receiving from the socket...");
     ssize_t recvSize = recv(sd, buffer, bufferSize - 1, 0);
@@ -289,12 +276,7 @@ static ssize_t ReceiveFromSocket(
  * @param bufferSize
  * @return
  */
-static ssize_t SendToSocket(
-        JNIEnv *env,
-        jobject obj,
-        int sd,
-        const char *buffer,
-        size_t bufferSize) {
+static ssize_t SendToSocket(JNIEnv *env,jobject obj,int sd,const char *buffer,size_t bufferSize) {
     //将数据缓冲区发送到socket
     LogMessage(env, obj, "Sending to the socket ...");
     ssize_t sendSize = send(sd, buffer, bufferSize, 0);
@@ -313,11 +295,11 @@ static ssize_t SendToSocket(
 }
 
 /*
- * Class:     com_year2018_ndk_activity_ch08_EchoServerActivity
+ * Class:     com_year2018_ndk_activity_socket_EchoServerActivity
  * Method:    nativeStartTcpServer
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_ch08_EchoServerActivity_nativeStartTcpServer
+JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_socket_EchoServerActivity_nativeStartTcpServer
         (JNIEnv *env, jobject obj, jint port) {
     //构造新的TCP socket
     int serverSocket = NewTcpSocket(env, obj);
@@ -366,12 +348,7 @@ JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_ch08_EchoServerActivity_na
     }
 }
 
-static void ConnectToAddress(
-        JNIEnv *env,
-        jobject obj,
-        int sd,
-        const char *ip,
-        unsigned short port) {
+static void ConnectToAddress(JNIEnv *env,jobject obj,int sd,const char *ip,unsigned short port) {
     //连接到给定的IP地址和给定的端口号
     LogMessage(env, obj, "Connecting to %s:%uh", ip, port);
 
@@ -397,11 +374,11 @@ static void ConnectToAddress(
 }
 
 /*
- * Class:     com_year2018_ndk_activity_ch08_EchoClientActivity
+ * Class:     com_year2018_ndk_activity_socket_EchoClientActivity
  * Method:    nativeStartTcpClient
  * Signature: (Ljava/lang/String;ILjava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_ch08_EchoClientActivity_nativeStartTcpClient
+JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_socket_EchoClientActivity_nativeStartTcpClient
         (JNIEnv *env, jobject obj, jstring ip, jint port, jstring message) {
     //构造新的TCP socket
     int clientSocket = NewTcpSocket(env, obj);
@@ -477,13 +454,10 @@ static int NewUdpSocket(JNIEnv *env, jobject obj) {
  * @param bufferSize
  * @return receive size
  */
-static ssize_t ReceiveDatagramFromSocket(
-        JNIEnv *env,
-        jobject obj,
-        int sd,
-        struct sockaddr_in *address,
-        char *buffer,
-        size_t bufferSize) {
+static ssize_t ReceiveDatagramFromSocket(JNIEnv *env,jobject obj,int sd,
+                                         struct sockaddr_in *address,
+                                         char *buffer,
+                                         size_t bufferSize) {
     socklen_t addressLength = sizeof(struct sockaddr_in);
     //从socket中接收数据报
     LogMessage(env, obj, "Receiving from the socket...");
@@ -517,17 +491,13 @@ static ssize_t ReceiveDatagramFromSocket(
  * @param bufferSize
  * @return
  */
-static ssize_t SendDatagramToSocket(
-        JNIEnv *env,
-        jobject obj,
-        int sd,
-        const struct sockaddr_in *address,
-        const char *buffer,
-        size_t bufferSize) {
+static ssize_t SendDatagramToSocket(JNIEnv *env,jobject obj,int sd,
+                                    const struct sockaddr_in *address,
+                                    const char *buffer,
+                                    size_t bufferSize) {
     //将数据发送至socket的数据缓冲区
     LogMessage(env, obj, "Sending to", address);
-    ssize_t sendSize = sendto(sd, buffer, bufferSize, 0,
-                              (const sockaddr *) address,
+    ssize_t sendSize = sendto(sd, buffer, bufferSize, 0,(const sockaddr *) address,
                               sizeof(struct sockaddr_in));
     //如果发送失败
     if (-1 == sendSize) {
@@ -540,11 +510,11 @@ static ssize_t SendDatagramToSocket(
 }
 
 /*
- * Class:     com_year2018_ndk_activity_ch08_EchoServerActivity
+ * Class:     com_year2018_ndk_activity_socket_EchoServerActivity
  * Method:    nativeStartUdpServer
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_ch08_EchoServerActivity_nativeStartUdpServer
+JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_socket_EchoServerActivity_nativeStartUdpServer
         (JNIEnv *env, jobject obj, jint port) {
     //构造一个新的UDP socket
     int serverSocket = NewUdpSocket(env, obj);
@@ -585,11 +555,11 @@ JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_ch08_EchoServerActivity_na
 }
 
 /*
- * Class:     com_year2018_ndk_activity_ch08_EchoClientActivity
+ * Class:     com_year2018_ndk_activity_socket_EchoClientActivity
  * Method:    nativeStartUdpClient
  * Signature: (Ljava/lang/String;ILjava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_ch08_EchoClientActivity_nativeStartUdpClient
+JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_socket_EchoClientActivity_nativeStartUdpClient
         (JNIEnv *env, jobject obj, jstring ip, jint port, jstring message) {
     //构造一个新的UDP socket
     int clientSocket = NewUdpSocket(env, obj);
@@ -742,11 +712,11 @@ static int AcceptOnLocalSocket(JNIEnv* env,jobject obj,int sd){
 }
 
 /*
- * Class:     com_year2018_ndk_activity_ch08_EchoLocalActivity
+ * Class:     com_year2018_ndk_activity_socket_EchoLocalActivity
  * Method:    nativeStartLocalServer
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_ch08_EchoLocalActivity_nativeStartLocalServer
+JNIEXPORT void JNICALL Java_com_year2018_ndk_activity_socket_EchoLocalActivity_nativeStartLocalServer
         (JNIEnv *env, jobject obj, jstring name) {
     //构造一个新的本地UNIX socket
     int serverSocket = NewLocalSocket(env,obj);

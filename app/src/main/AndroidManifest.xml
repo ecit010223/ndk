@@ -24,13 +24,13 @@
         <activity android:name=".activity.ThreadActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ch08.EchoServerActivity"
+        <activity android:name=".activity.socket.EchoLocalActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ch08.EchoLocalActivity"
+        <activity android:name=".activity.socket.EchoServerActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ch08.EchoClientActivity"
+        <activity android:name=".activity.socket.EchoClientActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
     </application>

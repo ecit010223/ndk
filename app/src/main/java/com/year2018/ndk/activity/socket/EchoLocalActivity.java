@@ -1,5 +1,7 @@
-package com.year2018.ndk.activity.ch08;
+package com.year2018.ndk.activity.socket;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.os.Bundle;
@@ -19,9 +21,19 @@ public class EchoLocalActivity extends AbstractEchoActivity {
     /** 消息编辑 **/
     private EditText mEtMessage;
 
-    public EchoLocalActivity() {
-        super(R.layout.activity_echo_local);
+    public static final void entry(Context from){
+        Intent intent = new Intent(from,EchoLocalActivity.class);
+        from.startActivity(intent);
     }
+
+    @Override
+    protected int getLayoutID() {
+        return R.layout.activity_echo_local;
+    }
+
+    //    public EchoLocalActivity() {
+//        super(R.layout.activity_echo_local);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -35,12 +35,28 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_main_socket"
+            android:id="@+id/btn_main_socket_local"
             style="@style/ViewNormal"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="socket"/>
+            android:text="socket local"/>
+        <Button
+            android:id="@+id/btn_main_socket_server"
+            style="@style/ViewNormal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/margin_normal"
+            android:layout_weight="1"
+            android:text="socket server"/>
+        <Button
+            android:id="@+id/btn_main_socket_client"
+            style="@style/ViewNormal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/margin_normal"
+            android:layout_weight="1"
+            android:text="socket client"/>
     </LinearLayout>
 
 </LinearLayout>

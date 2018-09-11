@@ -1,0 +1,93 @@
+0.网络字节排序
+在硬件层上，不同的机器体系结构使用不同的数据排序和表示规则，这被称为机器字节排序或字节序，例如：
+(1)Big-endian字节顺序首先储存最重要的字节
+(2)Little-endian字节顺序首先储存最不重要的字节。
+字节排序规则不同的机器不能直接交换数据，为了使字节规则不同的机器能在网络上通信，IP将big-endian字节排序
+声明为官方的数据传输网络字节排序规则。由于Java虚拟机已经在使用big-endian字节排序了，Java应用程序在进行
+跨网络通信时，不一定要做数据转换。与此相反，因为java虚拟机不执行原生组件，所以它们使用机器字节排序。
+ARM和x86机器结构使用little-endian字节排序
+MIPS机器结构使用big-endian字节排序
+在网络上通信时，原生代码需要在机器字节排序和网络字节排序间做必要的转换。
+socket库提供了一组便利函数，使原生应用程序可以透明地处理字节排序转换，这些函数通过sys/endian.h头文件声
+明：#include <sys/endian.h>
+htons：将unsigned short从主机字节排序转换到网络字节排序
+ntohs：和htons函数相反，将unsigned short从网络字节排序转换到主机字节排序
+htonl：将unsigned integer从主机字节排序转换到网络字节排序
+ntohl：和htonl函数相反，将unsigned integer从网络字节排序转换到主机字节排序
+采用这些方便的方法非常有益，因为这些方法的实现在编译时基于目标机器体系结构定义的。如果机器字节排序不同
+于网络字节排序，这些函数与合适的转换函数映射，否则它们不对数据执行任何操作。
+
+/************************************ 服务器端 *************************************/
+1.创建一个socket
+socket用一个名为socket描述符的整数表示，除了创建socket的函数外，socket API函数需要有效的socket描述符才
+能正常工作。
+int socket(int domain, int type, int protocol)
+domain：指定将会产生通信的socket域，并且选择将用到的协议族，目前Android平台支持的协议族：
+(1)PF_LOCAL：主机内部通信协议族，该协议族使物理上运行在同一台设备上的应用程序可以用socket APIs彼此通信。
+(2)PF_INET：Internet v4协议族，该协议族使应用程序可以在网络上其它地方运行的应用程序通信。
+type：指定通信的语义，支持以下几种主要的socket类型
+(1)SOCK_STREAM：提供使用TCP协议的、面向连接的通信Stream socket类型。
+(2)SOCK_DGRAM：提供使用UDP协议的、无连接的通信Datagram socket类型。
+protocol：指定将会用到的协议，对于大多数协议族和协议来说，只能使用一个协议。设为0选择默认协议。
+如果创建了合适的socket，socket函数返回相关的socket描述符，否则返回-1，且全局变量errno被相应也设置
+成错误值。
+
+2.将socket与个地址绑定
+当用socket函数创建一个socket后，该socket存在一个族空间，且没为该socket分配协议地址。为了使客户能够
+定位到这个socket并与之相连，它需要先与一个地址绑定，可以用bind函数将socket与地址绑定。
+int bind(int socketDescriptor,const struct sockaddr* address, socklen_t addressLength);
+socket描述符：指定将绑定到指定地址的socket实例
+address：指定socket被绑定的协议地址
+address length：指定传递给函数的协议地址结构的大小
+不同的协议族使用不同的协议地址。PF_INET协议族使用sockaddr_in结构体指定协议地址。
+struct sockadd_in{
+    sa_family_t sin_family;
+    unsigned short int sin_port;
+    struct in_addr sin_addr;
+}
+如果socket正确绑定，bind函数就返回零，否则返回-1且errno全局变量被设置为相应的错误值。
+
+3.监听进入的连接
+int listen(int socketDescriptor, int backlog)
+socketDescriptor：指定应用程序想要监听的输入连接socket实例
+backlog：指定保存挂起的输入连接的队列大小。如果应用程序正在忙于为客户服务，其它输入连接就要排序，队列中
+         挂起的连接数的最大值由backlog指定。当输入连接达到backlog所限定的值时，其它的输入连接将被拒绝。
+成功返回0，否则返回-1且errno全局变量被设置为相应的错误。
+
+4.接受传入连接
+int accept(int socketDescriptor, struct sockaddr* address, socklen_t* addressLength)
+显式地将输入连接从监听队列里取出并接受它
+accept函数是一个阻塞函数，如果在监听队列中没有即将到来的输入连接请求，它会使调用进程进入挂起状态，直到
+有新的输入连接到达。
+socketDescriptor：指定应用程序想要从其上接受输入连接的socket实例
+address：地址结构，在该地址结构中填入被连接的客户协议地址，如果应用程序不需要该信息，可以被设置为NULL。
+addressLength：为要填入的连接客户协议地址提供指定大小的内存空间，如果不需要该信息，可设置为NULL
+成功则返回与该连接实例交互时将会用到的客户socket描述符；否则，返回-1且全局变量errno被设置为错误值。
+
+5.从socket接收数据
+ssize_t recv(int socketDescriptor,void* buffer,size_t bufferLength,int flags)
+recv函数是一个阻塞函数。如果没有从给定的socket接收到数据，它会使调用进程进入挂起状态，直到接收到可用数
+据。
+socketDescriptor：指定应用程序想要从中接收数据的socket实例
+buffer：指向内存地址的指针，该内存用来保存从socket接收的数据
+bufferLength：指定缓冲区的大小，recv函数只会向缓冲区写入该参数指定大小的内容然后返回
+flags：指定接收所需要的额外标志
+成功则返回从socket那里接收到的字节数，否则返回-1且全局变量errno将被设置为相应的错误，如果返回0，则表示
+socket连接失败。
+
+6.向socket发送数据
+ssize_t send(int socketDescriptor,void* buffer,size_t bufferLength, int flags)
+阻塞函数，如果socket在忙着发送数据，它会使调用进程进入挂起状态直到socket可以传输数据。
+socketDescriptor：指定应用程序想要向其发送数据的socket实例
+buffer：指向内存地址的buffer指针，该内存是给定的socket发送数据的目的地
+bufferLength：指定缓冲区的大小，send函数只会向缓冲区传输该参数所指定大小的数据然后返回
+flags：指定发送所需要的额外标志
+成功返回传送的字节数，否则返回-1，且全局变量errno将被设备为相应的错误，如果返回0表示socket连接失败。
+
+/************************************* 客户端 ****************************************/
+1.与地址连接
+int connect(int socketDescriptor,const struct sockaddr *address, socklen_t addressLength)
+socketDescriptor：指定应用程序想要连接协议地址的socket实例
+address：指定socket要连接的协议地址
+addressLength：指定所提供的地址结构长度
+成功返回0，否则返回-1且将全局变量errno设置为相应的错误。
