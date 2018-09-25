@@ -7,4 +7,8 @@
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
+    <style name="TextGray">
+        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
 </resources>

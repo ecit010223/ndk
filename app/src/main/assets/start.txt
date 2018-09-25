@@ -2,7 +2,7 @@
 javah
 –classpath bin/classes   //class目录，java文件编译后生成的class文件存放目录
 –d jni //输出的目录
-com.year18.imooc_ndk.MainActivity    //包名加类名，该类包含native函数
+com.year18.ndk.MainActivity    //包名加类名，该类包含native函数
 //如果该命令报找不到Activity文件，则可以将android.jar包引入，引入方式则将-classpath修改为：
 -classpath bin/classes <android sdk目录>\platforms\android-16\android.jar
 
@@ -10,9 +10,9 @@ com.year18.imooc_ndk.MainActivity    //包名加类名，该类包含native函�
 (1)打开Terminal
 (2)通过cd命令将当前路径切换为\app\src\main\java
 (3)输入命令：
-javah –d ../jni com.year18.imooc_ndk.Hello
+javah –d ../jni com.year18.ndk.Hello
 //如出现错误：编码GBK的不可映射字符
-javah -d ../jni -encoding UTF-8 com.year18.imooc_ndk.Hello
+javah -d ../jni -encoding UTF-8 com.year18.ndk.Hello
 
 3.CMakeLists.txt
 可在defaultConfig结点下添加如下内容来指定C++版本：

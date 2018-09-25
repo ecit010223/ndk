@@ -27,10 +27,6 @@ public class EchoClientActivity extends AbstractEchoActivity {
         return R.layout.activity_echo_client;
     }
 
-    //    public EchoClientActivity() {
-//        super(R.layout.activity_echo_client);
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

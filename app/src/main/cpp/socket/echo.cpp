@@ -630,6 +630,9 @@ static int NewLocalSocket(JNIEnv *env, jobject obj) {
 }
 
 /**
+ * 将给定的本地socket与给定的本地socket名绑定。它检查本地socket名是否以斜线开头以确定所使用的命名空间是
+ * abstract命名空间还是文件系统命名空间。一旦本地socket与本地socket名绑定，应用程序可能开始等待并接收即
+ * 将到来的本地连接。
  * 与TCP及UDP sockets相同，一旦创建就不再需要分配协议地址，本地socket就在其socket族
  * 空间中存在。可以用同一个bind函数将本地socket与客户端用来连接的本地socket名绑定，
  * 通过sockaddr_un结构指定本地socket的协议地址。

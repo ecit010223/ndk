@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <EditText
+        android:id="@+id/et_transcode_file_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="avi视频文件名"
+        android:text="galleon.avi" >
+        <requestFocus />
+    </EditText>
+
+    <RadioGroup
+        android:id="@+id/rg_transcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/rb_transcode_bitmap_player"
+            style="@style/TextGray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Bitmap Player" />
+        <RadioButton
+            android:id="@+id/rb_transcode_openGL_player"
+            style="@style/TextGray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/openGL_player" />
+        <RadioButton
+            android:id="@+id/rb_transcode_native_player"
+            style="@style/TextGray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="原生Window Player" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btn_transcode_play"
+        style="@style/ViewNormal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_height_normal"
+        android:text="播放" />
+
+</LinearLayout>

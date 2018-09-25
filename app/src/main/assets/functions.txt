@@ -80,7 +80,7 @@ INADDR_ANY就是指地址为0.0.0.0的地址。
 8.ntohs
 网络字节顺序转换为主机字节顺序
 
-8.getsockname
+9.getsockname
 getsockname(SOCKET s,struct sockaddr FAR* name, int FAR* nameLen)
 获取一个套接字，特别适用于：未调用bind()就调用了connect()，这时唯有getsockname()调用可以获知系统内定
 的本地地址。
@@ -90,8 +90,17 @@ namelen：名字缓冲区长度
 若无错误发生，getsockname()返回0。否则的话，返回SOCKET_ERROR错误，应用程序可通过WSAGetLastError()获
 取相应错误代码。
 
-9.inet_aton
+10.inet_aton
 将一个字符串IP地址转换为一个32位的网络序列IP地址
 int inet_aton(const char *string, struct in_addr* addr)
 string：ASCII表示的IP地址
 addr：将要用新的IP地址更新的结构。
+
+11.offsetof
+该宏用于求结构体中一个成员在该结构体中的偏移量
+size_t offsetof(structName,memberName)
+第一个参数是结构体的名字，第二个参数是结构体成员的名字。该宏返回结构体structName中成员memberName偏移量。
+
+12.unlink
+#include<unistd.h>
+删除一个文件的目录项并减少它的链接数，若成功返回0，否则返回-1，错误原因存于error

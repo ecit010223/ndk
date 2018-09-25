@@ -16,6 +16,7 @@ import java.io.OutputStream;
 /**
  * Author: zyh
  * Date: 2018/9/10 16:41
+ * 在同一设备上的两个应用程序之间或者原生代码与Java层之间建立本地通信通道。
  */
 public class EchoLocalActivity extends AbstractEchoActivity {
     /** 消息编辑 **/
@@ -31,14 +32,10 @@ public class EchoLocalActivity extends AbstractEchoActivity {
         return R.layout.activity_echo_local;
     }
 
-    //    public EchoLocalActivity() {
-//        super(R.layout.activity_echo_local);
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mEtMessage = (EditText)findViewById(R.id.et_echo_message);
+        mEtMessage = findViewById(R.id.et_echo_message);
     }
 
     @Override

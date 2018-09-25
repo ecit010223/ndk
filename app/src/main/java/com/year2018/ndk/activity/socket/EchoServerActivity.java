@@ -21,10 +21,6 @@ public class EchoServerActivity extends AbstractEchoActivity {
         return R.layout.activity_echo_server;
     }
 
-    //    public EchoServerActivity() {
-//        super(R.layout.activity_echo_server);
-//    }
-
     @Override
     protected void onStartButtonClicked() {
         Integer port = getPort();

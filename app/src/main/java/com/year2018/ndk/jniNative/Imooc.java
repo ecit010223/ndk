@@ -11,7 +11,7 @@ import com.year2018.ndk.Constant;
 public class Imooc {
 
     private static void logMessage(String data){
-        Log.d(Constant.TAG,data);
+        Log.d(Constant.Log.TAG,data);
     }
 
     public static void staticMethod(String data){

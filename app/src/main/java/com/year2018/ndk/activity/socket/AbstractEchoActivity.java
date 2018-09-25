@@ -28,10 +28,6 @@ public abstract class AbstractEchoActivity extends Activity implements View.OnCl
     /** 日志视图 **/
     protected TextView mTvLog;
 
-//    public AbstractEchoActivity(int layoutID){
-//        this.mLayoutID = layoutID;
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

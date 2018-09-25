@@ -1,0 +1,6 @@
+并不是所有的原生图形API对各个版本的Android操作系统是可用的，如下：
+Native Graphics API    Android Version    API Level
+JNI Graphics API          2.2及以后         8及以后
+OpenGL ES 1.x             1.6及以后         4及以后
+OpenGL ES 2.0             2.0及以后         5及以后
+原生Window                2.4及以后         9及以后

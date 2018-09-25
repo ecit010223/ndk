@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.year2018.ndk.R;
+import com.year2018.ndk.activity.graphic.TranscodeActivity;
 import com.year2018.ndk.activity.socket.EchoClientActivity;
 import com.year2018.ndk.activity.socket.EchoLocalActivity;
 import com.year2018.ndk.activity.socket.EchoServerActivity;
@@ -28,6 +29,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btn_main_socket_local).setOnClickListener(this);
         findViewById(R.id.btn_main_socket_server).setOnClickListener(this);
         findViewById(R.id.btn_main_socket_client).setOnClickListener(this);
+        findViewById(R.id.btn_main_transcode).setOnClickListener(this);
     }
 
     @Override
@@ -47,6 +49,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btn_main_socket_client:
                 EchoClientActivity.entry(this);
+                break;
+            case R.id.btn_main_transcode:
+                TranscodeActivity.entry(this);
                 break;
         }
     }

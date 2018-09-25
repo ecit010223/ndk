@@ -1,0 +1,11 @@
+1.将本地socket与Name绑定
+与TCP及UDP sockets相同，一旦创建就不再需要分配协议地址，本地socket就在其socket族空间中存在。可以用一个
+bind函数将本地socket与客户端用来连接的本地socket名绑定，通过sockaddr_un结构指定本地socket的协议地址。
+struct sockaddr_un{
+    sa_family_t sun_family;
+    char sun_path[UNIX_PATH_MAX];
+};
+local socket协议地址只由一个名字构成。它没有IP地址或者端口号，可以在两个不同的命名空间创建本地socket名。
+(1)Abstract namespace：在本地socket通信协议模块中维护，socket名以NULL字符为前缀以绑定socket名。
+(2)Filesystem namespace：通过文件系统以一个特殊socket文件的形式维护，socket名直接传递给sockaddr_un结
+   构，将socket名与socket绑定。

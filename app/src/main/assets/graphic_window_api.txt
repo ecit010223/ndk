@@ -1,0 +1,66 @@
+从Android API level 9开始，Android NDK提供了一个API启用原生代码来直接访问和处理原生window的像素缓存，
+这个API称为原生window API。通过该API可以直接在原生代码了进行渲染而无须引用任何基于Java的API。
+原生Window API提供了4个原生函数用于访问和操作Bitmap对象。
+
+1.从Surface对象中检索原生Window
+ANativeWindow_fromSurface函数可以从给定的Surface对象中检索原生window
+ANativeWindow* ANativeWindow_fromSurface(JNIEnv* env, jobject surface);
+返回值是一个指向原生window实例的指针。ANativeWindow_fromSurface同时获得了返回的原生window实例的引用，
+为了防止内容泄露，需要使用ANativeWindow_release函数来释放掉。
+
+2.获取原生Window实例中的引用
+为了防止原生window实例被删除，原生代码可以使用ANativeWindow_acquire函数来获取它的引用。
+void ANativeWindow_acquire(ANativeWindow* window);
+任何ANativeWindow_acquire函数调用都要对应一个ANativeWindow_release函数的调用。
+
+3.释放原生Window引用
+如上所述，为了防止内存泄露，每个原生window的引用都应该使用ANativeWindow_release来进行释放。
+void ANativeWindow_release(ANativeWindow* window);
+ANativeWindow_release的参数为一个原生window实例指针。
+
+4.检索原生Window信息
+原生Window API为原生代码提供了获取很多有关原生window信息的函数，例如大小和像素格式：
+ANativeWindow_getWindow：用于检索原生window的宽度。
+ANativeWindow_getHeight：用于检索原生window的高度。
+ANativeWindow_getFormat：用于检索原生window的像素格式。
+
+5.设置原生window缓冲区的几何形状
+原生window的大小和像素格式应该与即将渲染的图像数据匹配。如果图像数据的大小或者格式不一致，可以用
+ANativeWindow_setBuffersGeometry函数来重新配置原生window缓冲区，这样缓冲区就会自动缩放来匹配原生window。
+int32_t ANativeWindow_setBufferGeometry(ANativeWindow* window,
+                                        int32_t width,
+                                        int32_t height,
+                                        int32_t format);
+window：原生window实例的指针
+width：原生缓冲区的新宽度
+height：原生缓冲区的新高度
+format：原生缓冲区的新像素格式
+
+6.访问原生window缓冲区
+ANativeWindow_lock函数用来锁定原生window缓冲区并获得一个原始像素缓冲区的指针，原生代码可以使用这个指针
+来访问和操作像素缓冲区。
+int32_t ANativeWindow_lock(ANativeWindow* window,
+                           ANativeWindow_Buffer* outBuffer,
+                           ARect* inOutDirtyBounds);
+该函数的参数是前面获得的原生window实例的指针、指向ANativeWindow_Buffer结构体的指针以及指向可选ARect结
+构体的指针。ANativeWindow_Buffer结构体除了拥有原生window的相关信息外，还可以通过位字段来访问原生像素缓
+冲区。
+typedef struct ANativeWindow_Buffer{
+    //水平显示的像素数
+    int32_t width;
+    //垂直显示的像素数
+    int32_t height;
+    //缓冲区在内存中一行的像素数，可能>=width
+    int32_t stride;
+    //缓冲区的格式，如：WINDOW_FORMAT *
+    int32_t format;
+    //实际位数
+    void* bits;
+    //不要碰
+    uint32_t reserved[6];
+}ANativeWindow_Buffer;
+
+7.释放原生window缓冲区
+一旦原生代码完成，应该使用ANativeWindow_unlockAndPost函数解锁并输出原生window缓冲区。
+int32_t ANativeWindow_unlockAndPost(ANativeWindow* window);
+该函数的参数是一个已经被锁定的原生window实例指针。成功返回0。
