@@ -53,7 +53,7 @@ JNIEXPORT jlong JNICALL Java_com_year2018_ndk_activity_graphic_OpenGLPlayerActiv
     }
 
     exit:
-    return (jlong) instance;
+        return (jlong) instance;
 }
 
 /*

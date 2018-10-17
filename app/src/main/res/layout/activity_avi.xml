@@ -5,7 +5,7 @@
     android:background="@android:color/white">
 
     <EditText
-        android:id="@+id/et_transcode_file_name"
+        android:id="@+id/et_avi_filename"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -15,25 +15,25 @@
     </EditText>
 
     <RadioGroup
-        android:id="@+id/rg_transcode"
+        android:id="@+id/rg_avi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
         <RadioButton
-            android:id="@+id/rb_transcode_bitmap_player"
+            android:id="@+id/rb_avi_bitmap_player"
             style="@style/TextGray"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="Bitmap Player" />
         <RadioButton
-            android:id="@+id/rb_transcode_openGL_player"
+            android:id="@+id/rb_avi_openGL_player"
             style="@style/TextGray"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/openGL_player" />
         <RadioButton
-            android:id="@+id/rb_transcode_native_player"
+            android:id="@+id/rb_avi_native_player"
             style="@style/TextGray"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
     </RadioGroup>
 
     <Button
-        android:id="@+id/btn_transcode_play"
+        android:id="@+id/btn_avi_play"
         style="@style/ViewNormal"
         android:layout_width="match_parent"
         android:layout_height="@dimen/view_height_normal"

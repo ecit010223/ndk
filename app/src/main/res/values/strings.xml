@@ -8,4 +8,5 @@
     <string name="start_threads">启动线程</string>
     <string name="error_alert_title">发生错误</string>
     <string name="openGL_player">OpenGL Player</string>
+    <string name="wav_player">WAV Player</string>
 </resources>

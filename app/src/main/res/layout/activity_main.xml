@@ -66,11 +66,18 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_main_transcode"
+            android:id="@+id/btn_main_avi"
             style="@style/ViewNormal"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="transcode avilib"/>
+            android:text="视频播放"/>
+        <Button
+            android:id="@+id/btn_main_wav"
+            style="@style/ViewNormal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="音频播放"/>
     </LinearLayout>
 </LinearLayout>

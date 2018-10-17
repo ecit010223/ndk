@@ -78,6 +78,15 @@ add_library( # Sets the name of the library.
 			 src/main/cpp/graphic/NativeWindowPlayerActivity.cpp
 )
 
+add_library(
+        wav-lib
+
+        SHARED
+
+        src/main/cpp/transcode/wavlib.c
+		src/main/cpp/wav/WavActivity.cpp
+)
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -153,3 +162,11 @@ target_link_libraries( # Specifies the target library.
                        ${jniGraphics-lib}
                        ${GLESv1-lib}
                        ${android-lib} )
+
+target_link_libraries(
+        wav-lib
+
+        ${log-lib}
+        ${android-lib}
+        OpenSLES
+)

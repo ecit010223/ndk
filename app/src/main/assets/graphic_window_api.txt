@@ -26,7 +26,8 @@ ANativeWindow_getFormat：用于检索原生window的像素格式。
 
 5.设置原生window缓冲区的几何形状
 原生window的大小和像素格式应该与即将渲染的图像数据匹配。如果图像数据的大小或者格式不一致，可以用
-ANativeWindow_setBuffersGeometry函数来重新配置原生window缓冲区，这样缓冲区就会自动缩放来匹配原生window。
+ANativeWindow_setBuffersGeometry函数来重新配置原生window缓冲区，这样缓冲区就会自动缩放来匹配原
+生window。
 int32_t ANativeWindow_setBufferGeometry(ANativeWindow* window,
                                         int32_t width,
                                         int32_t height,
@@ -35,6 +36,8 @@ window：原生window实例的指针
 width：原生缓冲区的新宽度
 height：原生缓冲区的新高度
 format：原生缓冲区的新像素格式
+成功的话，会返回0。
+对于的所有参数，如果提供的值为0，那么参数值将被恢复到原生window缓冲区的基础值。
 
 6.访问原生window缓冲区
 ANativeWindow_lock函数用来锁定原生window缓冲区并获得一个原始像素缓冲区的指针，原生代码可以使用这个指针
