@@ -411,7 +411,7 @@ static void CreateBufferQueueAudioPlayer(
     SLDataFormat_PCM dataSourceFormat = {
             SL_DATAFORMAT_PCM,        // 格式类型
             wav_get_channels(wav),    // 通道数
-            wav_get_rate(wav) * 1000, // 毫赫兹/秒的样本数
+            wav_get_rate(wav) * (SLuint32)1000, // 毫赫兹/秒的样本数
             wav_get_bits(wav),        // 每个样本的位数
             wav_get_bits(wav),        // 容器大小
             SL_SPEAKER_FRONT_CENTER,  // 通道屏蔽
